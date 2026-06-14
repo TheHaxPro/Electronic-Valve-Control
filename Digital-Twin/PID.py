@@ -11,6 +11,12 @@ time_array = np.arange(0,sim_time,dt)
 u_array = np.zeros(steps)
 y_target_array = np.zeros(steps)
 y_array = np.zeros(steps)
+e_array = np.zeros(steps)
+
+ISE = 0
+IAE = 0
+ITAE = 0
+ISC = 0
 
 ### OBJECT PARAMETERS ###
 spring_offset = 1480
@@ -26,12 +32,15 @@ y = 0.0
 ### PID PARAMETERS ###
 K = 50.0
 Ti = 5.0
-Td = 0.02
+Td = 0.015
+Kff = 1.0
 uI_last = 0.0
 error_last = 0.0
 dy_dt = 0.0
 
-
+### FILTER PARAMETERS ###
+alpha_filter = 0.5
+y_filtered_last = 0.0
 
 y_target = 50.0
 
@@ -40,16 +49,22 @@ for step in range(steps):
     if step == 1000: y_target = 70.0
     if step == 2000: y_target = 0.0
 
-    y = y + np.random.uniform(-0.5, 0.5)
+    y_measured = y + np.random.uniform(-0.5, 0.5)
 
-    error = y_target - y
+    y_filtered = alpha_filter * y_measured + (1 - alpha_filter) * y_filtered_last
+    y_filtered_last = y_filtered
+
+    error = y_target - y_filtered
+    e_array[step] = error
 
     uP = K * error
     uI = uI_last + K / Ti * dt * (error_last + error) / 2
+    if uI > 3999: uI = 3999
+    if uI < -3999: uI = -3999
     uD = K * Td * (error - error_last) / dt
 
     ## Inverse Model Feedforward
-    uFF = spring_offset + y_target * K_spring
+    uFF = Kff * (spring_offset + y_target * K_spring)
 
     u = uP + uI + uD + uFF
 
@@ -97,14 +112,36 @@ for step in range(steps):
     y_target_array[step] = y_target
     y_array[step] = y
 
+    ITAE += step * dt * np.abs(error) * dt
+
+ISE = np.sum(e_array ** 2) * dt
+IAE = np.sum(np.abs(e_array)) * dt
+ISC = np.sum(u_array ** 2) * dt
+
 
 ### PLOT ###
-plt.figure(figsize=(10, 6))
-plt.plot(time_array, y_target_array, 'r--', label='Target [%]')
-plt.plot(time_array, y_array, 'b-', label='Real position [%]')
-plt.title('Electronic Valve Control Simulation')
-plt.xlabel('Time [s]')
-plt.ylabel('Position [%]')
-plt.legend()
-plt.grid(True)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), gridspec_kw={'height_ratios': [2, 1]})
+
+# Górny wykres - y(t)
+ax1.plot(time_array, y_target_array, 'r--', label='Target [%]')
+ax1.plot(time_array, y_array, 'b-', label='Real position [%]')
+ax1.set_title('Symulacja algorytmu PID - Skoki wartości zadanej')
+ax1.set_ylabel('Pozycja [%]')
+ax1.set_xlabel('Czas [s]')
+ax1.legend()
+ax1.grid(True)
+
+# Dolny wykres - u(t)
+ax2.plot(time_array, u_array, 'g-', label='PWM signal (U)')
+ax2.set_xlabel('Czas [s]')
+ax2.set_ylabel('Sterowanie PWM')
+ax2.legend()
+ax2.grid(True)
+
+plt.tight_layout()
 plt.show()
+
+print("ISE: ", round(ISE, 2))
+print("IAE: ", round(IAE, 2))
+print("ITAE: ", round(ITAE, 2))
+print("ISC: ", round(ISC, 2))
