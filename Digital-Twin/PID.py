@@ -1,3 +1,4 @@
+import math
 from math import copysign
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,6 +49,7 @@ y_target = 50.0
 for step in range(steps):
     if step == 1000: y_target = 70.0
     if step == 2000: y_target = 0.0
+    # y_target = math.sin(step * math.pi/1500) * 30 + 50
 
     y_measured = y + np.random.uniform(-0.5, 0.5)
 
