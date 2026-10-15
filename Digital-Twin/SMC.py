@@ -59,9 +59,9 @@ for step in range(steps):
     current_time = step * dt
     omega = 2.0 * math.pi / 3.0
 
-    # if step == 1000: y_target = 70.0
-    # if step == 2000: y_target = 0.0
-    y_target = math.sin(current_time * omega) * 30 + 50
+    if step == 1000: y_target = 70.0
+    if step == 2000: y_target = 0.0
+    # y_target = math.sin(current_time * omega) * 30 + 50
     d2y_target_dt2 = -30.0 * (omega ** 2) * math.sin(omega * current_time)
 
 

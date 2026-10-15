@@ -58,9 +58,9 @@ for step in range(steps):
     current_time = step * dt
     omega = 2.0 * math.pi / 3.0
 
-    # if step == 1000: y_target = 70.0
-    # if step == 2000: y_target = 0.0
-    y_target = math.sin(current_time * omega) * 30 + 50
+    if step == 1000: y_target = 70.0
+    if step == 2000: y_target = 0.0
+    # y_target = math.sin(current_time * omega) * 30 + 50
 
     y_measured = y + np.random.uniform(-0.5, 0.5)
 

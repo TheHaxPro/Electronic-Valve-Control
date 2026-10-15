@@ -45,8 +45,8 @@ Bd = np.array(B * dt)
 N = 50
 Nu = 5
 
-Q = 1000.0
-R = 0.01
+Q = np.matrix([[1000.0, 0.0], [0.0, 10.0]])
+R = 0.1
 
 def cost_function(U_future, x_current, target_trajectory, Ad, Bd, Q, R):
     J = 0.0
@@ -60,7 +60,7 @@ def cost_function(U_future, x_current, target_trajectory, Ad, Bd, Q, R):
 
         x_sim = Ad @ x_sim + Bd * u_k
 
-        J += Q * float(x_sim[0, 0] - target_trajectory[k]) ** 2 + R * u_k ** 2
+        J += Q[0, 0] * float(x_sim[0, 0] - target_trajectory[k]) ** 2 + R * u_k ** 2 + Q[1, 1] * float(x_sim[1, 0]) ** 2
 
     return J
 
@@ -72,9 +72,9 @@ y_target = 50.0
 
 ### SIMULATION ###
 for step in range(steps):
-    if step == 1000: y_target = 70.0
-    if step == 2000: y_target = 0.0
-    # y_target = math.sin(step * math.pi/1500) * 30 + 50
+    # if step == 1000: y_target = 70.0
+    # if step == 2000: y_target = 0.0
+    y_target = math.sin(step * math.pi/1500) * 30 + 50
 
     y_measured = y + np.random.uniform(-0.5, 0.5)
 

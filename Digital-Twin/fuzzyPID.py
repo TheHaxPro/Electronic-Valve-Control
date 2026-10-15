@@ -115,16 +115,13 @@ def get_fuzzy_attr(error, error_last):
 
     for e_key, e_val in error_linguistic.items():
         for de_key, de_val in der_error_linguistic.items():
-            # Siła aktywacji reguły (T-norma minimum)
             activation = min(e_val, de_val)
 
             if activation > 0:
-                # Wyciągnięcie reguł dla danej kombinacji
                 out_p = rules_Kp[e_key][de_key]
                 out_i = rules_Ki[e_key][de_key]
                 out_d = rules_Kd[e_key][de_key]
 
-                # Akumulacja do licznika i mianownika (wyostrzanie)
                 num_p += activation * centers[out_p]
                 den_p += activation
 
@@ -134,7 +131,6 @@ def get_fuzzy_attr(error, error_last):
                 num_d += activation * centers[out_d]
                 den_d += activation
 
-    # Zabezpieczenie przed dzieleniem przez zero i obliczenie wyjścia
     delta_Kp_norm = (num_p / den_p) if den_p != 0 else 0.0
     delta_Ki_norm = (num_i / den_i) if den_i != 0 else 0.0
     delta_Kd_norm = (num_d / den_d) if den_d != 0 else 0.0
