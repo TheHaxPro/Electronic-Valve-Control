@@ -72,14 +72,13 @@ y_target = 50.0
 
 ### SIMULATION ###
 for step in range(steps):
-    # if step == 1000: y_target = 70.0
-    # if step == 2000: y_target = 0.0
-    y_target = math.sin(step * math.pi/1500) * 30 + 50
+    if step == 1000: y_target = 70.0
+    if step == 2000: y_target = 0.0
+    # y_target = math.sin(step * math.pi/1500) * 30 + 50
 
     y_measured = y + np.random.uniform(-0.5, 0.5)
 
     y_filtered = alpha_filter * y_measured + (1 - alpha_filter) * y_filtered_last
-    y_filtered_last = y_filtered
 
     error = y_target - y_filtered
     e_array[step] = error
@@ -139,6 +138,7 @@ for step in range(steps):
         dy_dt = 0.0
 
     error_last = error
+    y_filtered_last = y_filtered
 
     u_array[step] = u
     y_target_array[step] = y_target

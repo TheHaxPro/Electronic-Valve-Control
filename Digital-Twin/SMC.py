@@ -59,16 +59,15 @@ for step in range(steps):
     current_time = step * dt
     omega = 2.0 * math.pi / 3.0
 
-    if step == 1000: y_target = 70.0
-    if step == 2000: y_target = 0.0
-    # y_target = math.sin(current_time * omega) * 30 + 50
+    # if step == 1000: y_target = 70.0
+    # if step == 2000: y_target = 0.0
+    y_target = math.sin(current_time * omega) * 30 + 50
     d2y_target_dt2 = -30.0 * (omega ** 2) * math.sin(omega * current_time)
 
 
     y_measured = y + np.random.uniform(-0.5, 0.5)
 
     y_filtered = alpha_filter * y_measured + (1 - alpha_filter) * y_filtered_last
-    y_filtered_last = y_filtered
 
     error = y_target - y_filtered
     e_array[step] = error
@@ -122,6 +121,7 @@ for step in range(steps):
 
     error_last = error
     y_target_last = y_target
+    y_filtered_last = y_filtered
 
     u_array[step] = u
     y_target_array[step] = y_target

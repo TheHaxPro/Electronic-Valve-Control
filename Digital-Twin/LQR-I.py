@@ -36,8 +36,8 @@ y = 0.0
 A = np.matrix([[0, 1, 0], [-K_spring/J_obj, -B_friction/J_obj, 0], [-1, 0, 0]])
 B = np.matrix([[0], [K_motor/J_obj], [0]])
 
-Q = np.diag([100.0, 1.0, 500.0])
-R = np.array([[0.08]])
+Q = np.diag([600.0, 0.05, 1000.0])
+R = np.array([[0.15]])
 
 P = solve_continuous_are(A, B, Q, R)
 
@@ -65,7 +65,6 @@ for step in range(steps):
     y_measured = y + np.random.uniform(-0.5, 0.5)
 
     y_filtered = alpha_filter * y_measured + (1 - alpha_filter) * y_filtered_last
-    y_filtered_last = y_filtered
 
     error = y_target - y_filtered
     e_array[step] = error
@@ -75,14 +74,14 @@ for step in range(steps):
     dy_filtered = (y_filtered - y_filtered_last) / dt
     error_dt = dy_target - dy_filtered
 
-    u = K[0, 0] * error + K[0, 1] * dy_filtered - K[0, 2] * error_integral
+    u = K[0, 0] * error - K[0, 1] * dy_filtered - K[0, 2] * error_integral
 
     u += spring_offset
 
     if u > 3999: u = 3999
     if u < 0: u = 0
 
-    motor_torque = u
+    motor_torque = u * K_motor
 
     spring_torque = spring_offset + y * K_spring
 
@@ -118,6 +117,7 @@ for step in range(steps):
 
     error_last = error
     y_target_last = y_target
+    y_filtered_last = y_filtered
 
     u_array[step] = u
     y_target_array[step] = y_target
